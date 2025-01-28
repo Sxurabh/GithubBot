@@ -1,23 +1,27 @@
-name: Daily Telegram Bot
+name: Send Trending GitHub Repos to Telegram
 
 on:
+  workflow_dispatch:  # Allows manual run
   schedule:
-    - cron: "0 21 * * *"  # Runs daily at 9 PM UTC (adjust timezone if needed)
+    - cron: "0 15 * * *"  # Runs at 9 PM IST (15:00 UTC)
 
 jobs:
-  run-bot:
+  trending-repos:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: 3.9
+          python-version: "3.x"
+
       - name: Install dependencies
-        run: |
-          pip install python-telegram-bot requests
-      - name: Run Telegram Bot
+        run: pip install requests
+
+      - name: Run the script
         env:
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python bot.py
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python github_trending.py
