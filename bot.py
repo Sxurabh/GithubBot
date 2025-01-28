@@ -2,8 +2,8 @@ import requests
 from telegram import Bot
 
 # Telegram Credentials
-TELEGRAM_TOKEN = "8070383408:AAEUzxeDPfLC2KytDHAlCc0rSZWlSmydMFg"
-CHAT_ID = "sxurxbh"
+TELEGRAM_TOKEN = "YOUR_BOT_TOKEN"
+CHAT_ID = "YOUR_CHAT_ID"
 
 def get_trending_repos():
     # GitHub Trending API (unofficial, but works)
