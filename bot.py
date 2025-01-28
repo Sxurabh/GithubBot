@@ -1,24 +1,22 @@
 import requests
-from telegram import Bot
+import os
 
-# Telegram Credentials
-TELEGRAM_TOKEN = "YOUR_BOT_TOKEN"
-CHAT_ID = "YOUR_CHAT_ID"
+# Get Telegram credentials from GitHub Secrets
+BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-def get_trending_repos():
-    # GitHub Trending API (unofficial, but works)
-    url = "https://gh-trending-api.herokuapp.com/repositories"
-    response = requests.get(url)
-    repos = response.json()
-    
-    message = "📈 Today's Trending GitHub Repos:\n\n"
-    for repo in repos[:10]:  # Top 10 repos
-        message += f"{repo['name']}: {repo['url']}\n\n"
-    return message
+# Fetch trending repos from GitHub
+url = "https://api.github.com/search/repositories?q=stars:>1000&sort=stars&order=desc"
+response = requests.get(url)
+repos = response.json()["items"][:5]  # Get top 5 trending repos
 
-def send_message():
-    bot = Bot(token=TELEGRAM_TOKEN)
-    bot.send_message(chat_id=CHAT_ID, text=get_trending_repos())
+# Format message
+message = "🔥 Trending GitHub Repos Today:\n\n"
+for repo in repos:
+    message += f"🔹 {repo['name']} - ⭐ {repo['stargazers_count']}\n{repo['html_url']}\n\n"
 
-if __name__ == "__main__":
-    send_message()
+# Send message via Telegram bot
+telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+requests.post(telegram_url, data={"chat_id": CHAT_ID, "text": message})
+
+print("Message sent successfully!")
