@@ -6,21 +6,21 @@ from bs4 import BeautifulSoup
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-# GitHub Trending URLs for different timeframes
+# GitHub Trending URLs for Overall and Python-specific repos
 timeframes = {
-    "Today": "https://github.com/trending?since=daily",
-    "Weekly": "https://github.com/trending?since=weekly",
-    "Monthly": "https://github.com/trending?since=monthly",
+    "Today": "daily",
+    "Weekly": "weekly",
+    "Monthly": "monthly",
 }
 
-# User-Agent to avoid request blocking
+base_url = "https://github.com/trending"
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 def fetch_trending_repos(url):
-    """Fetch trending repositories from GitHub Trending page."""
+    """Fetch top 20 trending repositories from GitHub Trending page."""
     response = requests.get(url, headers=HEADERS)
     soup = BeautifulSoup(response.text, "html.parser")
-    repos = soup.find_all("article", class_="Box-row")[:20]  # Get top 20 trending repos
+    repos = soup.find_all("article", class_="Box-row")[:20]  # Get top 20 repos
     repo_list = []
     
     for repo in repos:
@@ -35,10 +35,15 @@ def fetch_trending_repos(url):
 
 # Build the final message
 message = "🔥 **Trending GitHub Repositories**\n\n"
-for timeframe, url in timeframes.items():
-    message += f"📅 **{timeframe}**\n"
-    trending_repos = fetch_trending_repos(url)
+
+for timeframe, param in timeframes.items():
+    message += f"📅 **{timeframe} - All Languages**\n"
+    trending_repos = fetch_trending_repos(f"{base_url}?since={param}")
     message += "\n".join(trending_repos) + "\n\n"
+
+    message += f"🐍 **{timeframe} - Python Only**\n"
+    python_trending_repos = fetch_trending_repos(f"{base_url}/python?since={param}")
+    message += "\n".join(python_trending_repos) + "\n\n"
 
 # Send message via Telegram bot
 telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
