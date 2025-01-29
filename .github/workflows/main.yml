@@ -2,9 +2,6 @@ name: Send Trending GitHub Repos to Telegram
 
 on:
   workflow_dispatch:  # Allows manual execution
-  push:  # Runs whenever you push changes to the repo
-    branches:
-      - main
   schedule:
     - cron: "0 15 * * *"  # Runs at 9 PM IST (15:00 UTC)
 
@@ -21,7 +18,8 @@ jobs:
           python-version: "3.x"
 
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          pip install requests beautifulsoup4  # Install missing bs4
 
       - name: Run the script
         env:
