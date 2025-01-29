@@ -3,8 +3,8 @@ import os
 from bs4 import BeautifulSoup
 
 # Set your Telegram Bot Token and Chat ID here
-BOT_TOKEN = "your_telegram_bot_token"
-CHAT_ID = "your_chat_id"
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
 
 # Fetch trending repositories (unofficial GitHub Trending API)
 url = "https://github.com/trending?since=daily"
