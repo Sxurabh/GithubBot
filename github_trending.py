@@ -17,10 +17,10 @@ base_url = "https://github.com/trending"
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 def fetch_trending_repos(url):
-    """Fetch top 20 trending repositories from GitHub Trending page with descriptions."""
+    """Fetch top 10 trending repositories from GitHub Trending page with descriptions."""
     response = requests.get(url, headers=HEADERS)
     soup = BeautifulSoup(response.text, "html.parser")
-    repos = soup.find_all("article", class_="Box-row")[:20]  # Get top 20 repos
+    repos = soup.find_all("article", class_="Box-row")[:10]  # Reduced to top 10 repos
     repo_list = []
     
     for repo in repos:
