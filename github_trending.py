@@ -1,22 +1,32 @@
 import requests
 import os
+from bs4 import BeautifulSoup
 
-# Get Telegram credentials from GitHub Secrets
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+# Set your Telegram Bot Token and Chat ID here
+BOT_TOKEN = "your_telegram_bot_token"
+CHAT_ID = "your_chat_id"
 
-# Fetch trending repos from GitHub
-url = "https://api.github.com/search/repositories?q=stars:>1000&sort=stars&order=desc"
-response = requests.get(url)
-repos = response.json()["items"][:5]  # Get top 5 trending repos
+# Fetch trending repositories (unofficial GitHub Trending API)
+url = "https://github.com/trending?since=daily"
+headers = {"User-Agent": "Mozilla/5.0"}
+response = requests.get(url, headers=headers)
+
+# Parse HTML to extract trending repo details
+soup = BeautifulSoup(response.text, "html.parser")
+repos = soup.find_all("article", class_="Box-row")[:5]  # Get top 5 trending
 
 # Format message
-message = "🔥 Trending GitHub Repos Today:\n\n"
+message = "🔥 Trending GitHub Repos (Today):\n\n"
 for repo in repos:
-    message += f"🔹 {repo['name']} - ⭐ {repo['stargazers_count']}\n{repo['html_url']}\n\n"
+    title = repo.find("h2").text.strip().replace("\n", "").replace(" ", "")
+    repo_link = "https://github.com" + repo.find("a")["href"]
+    stars = repo.find("a", {"href": lambda x: x and x.endswith("/stargazers")})
+    stars_count = stars.text.strip() if stars else "N/A"
+    
+    message += f"🔹 {title} - ⭐ {stars_count}\n{repo_link}\n\n"
 
 # Send message via Telegram bot
 telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 requests.post(telegram_url, data={"chat_id": CHAT_ID, "text": message})
 
-print("Message sent successfully!")
+print("✅ Message sent successfully!")
