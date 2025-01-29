@@ -27,6 +27,7 @@ for repo in repos:
 
 # Send message via Telegram bot
 telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-requests.post(telegram_url, data={"chat_id": CHAT_ID, "text": message})
+response = requests.post(telegram_url, data={"chat_id": CHAT_ID, "text": message})
+print(response.json())  # Print Telegram API response
 
 print("✅ Message sent successfully!")
